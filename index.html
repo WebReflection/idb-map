@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module">
+        import IDBPath from './index.js';
+
+        const encoder = new TextEncoder;
+        const decoder = new TextDecoder;
+
+        const root = new IDBPath('/');
+        console.log(await root.size);
+        console.log(await root.has('nope'));
+        await root.set('test.txt', 'test value');
+        console.log(await root.has('test.txt'));
+        await root.set('other.txt', encoder.encode('other value'));
+        console.log(await root.get('test.txt'));
+        console.log(decoder.decode(await root.get('other.txt')));
+        console.log(await root.keys());
+        console.log(await root.size);
+        for (const entry of await root.entries())
+            console.log(entry);
+        await root.delete('other.txt');
+        console.log(await root.keys());
+        console.log(await root.size);
+        await root.clear();
+        console.log(await root.keys());
+        console.log(await root.size);
+        // console.time('purge');
+        // await root.purge();
+        // console.timeEnd('purge');
+        await root.close();
+    </script>
+</head>
+</html>
