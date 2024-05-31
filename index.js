@@ -13,11 +13,7 @@ const READWRITE = 'readwrite';
 /** @type {IDBTransactionOptions} */
 const defaultOptions = { durability: 'default' };
 
-/**
- * @param {unknown[]} values
- * @returns {Promise<unknown[]>}
- */
-const all = values => Promise.all(values);
+const events = new Set(['abort', 'close', 'error', 'versionchange']);
 
 /**
  * @template T
@@ -79,11 +75,6 @@ export default class IDBMap extends EventTarget {
     }).then(result => {
       const boundDispatch = this.dispatchEvent.bind(this);
       for (const key in result) {
-        // IDBDatabase events:
-        //  - onabort
-        //  - onclose
-        //  - onerror
-        //  - onversionchange
         if (key.startsWith('on'))
           result[key] = boundDispatch;
       }
@@ -91,14 +82,19 @@ export default class IDBMap extends EventTarget {
     });
   }
 
-  // EventTarget Overrides
+  // EventTarget Forwards
   /**
    * @param {Event} event
    * @returns 
    */
   dispatchEvent(event) {
     const { type, message } = event;
-    return super.dispatchEvent(assign(new Event(type), { message }));
+    return super.dispatchEvent(
+      // avoid re-dispatching of the same event
+      events.has(type) ?
+        assign(new Event(type), { message }) :
+        event
+    );
   }
 
   // IDBDatabase Forwards
@@ -141,7 +137,7 @@ export default class IDBMap extends EventTarget {
 
   async values() {
     const keys = await this.keys();
-    return all(keys.map(key => this.get(key)));
+    return Promise.all(keys.map(key => this.get(key)));
   }
 
   /**
@@ -149,7 +145,7 @@ export default class IDBMap extends EventTarget {
    */
   async entries() {
     const keys = await this.keys();
-    return all(keys.map(key => this.get(key).then(value => [key, value])));
+    return Promise.all(keys.map(key => this.get(key).then(value => [key, value])));
   }
 
   /**
