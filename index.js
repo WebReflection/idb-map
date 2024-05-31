@@ -63,9 +63,8 @@ export default class IDBMap extends EventTarget {
         indexedDB.open('IDBMap'),
         {
           onupgradeneeded({ target: { result, transaction } }) {
-            if (!result.objectStoreNames.contains(name)) {
-              result.createObjectStore(name, { keyPath: 'key' });
-            }
+            if (!result.objectStoreNames.contains(name))
+              result.createObjectStore(name);
             transaction.oncomplete = () => resolve(result);
           },
           onsuccess(event) {
@@ -80,6 +79,11 @@ export default class IDBMap extends EventTarget {
     }).then(result => {
       const boundDispatch = this.dispatchEvent.bind(this);
       for (const key in result) {
+        // IDBDatabase events:
+        //  - onabort
+        //  - onclose
+        //  - onerror
+        //  - onversionchange
         if (key.startsWith('on'))
           result[key] = boundDispatch;
       }
@@ -97,7 +101,7 @@ export default class IDBMap extends EventTarget {
     return super.dispatchEvent(assign(new Event(type), { message }));
   }
 
-  // IDBDatabase Overrides
+  // IDBDatabase Forwards
   async close() {
     (await this.#db).close();
   }
@@ -162,11 +166,11 @@ export default class IDBMap extends EventTarget {
    * @returns {Promise<unknown | undefined>}
    */
   async get(key) {
-    const kv = await this.#transaction(
+    const value = await this.#transaction(
       store => store.get(key),
       READONLY,
     ).then(result);
-    return kv?.value;
+    return value;
   }
 
   /**
@@ -186,7 +190,7 @@ export default class IDBMap extends EventTarget {
    */
   async set(key, value) {
     await this.#transaction(
-      store => store.put({ key, value }),
+      store => store.put(value, key),
       READWRITE,
     );
     return this;

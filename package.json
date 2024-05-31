@@ -1,13 +1,16 @@
 {
   "name": "idbpath",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "main": "index.js",
   "module": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["IndexedDB", "Map"],
+  "keywords": [
+    "IndexedDB",
+    "Map"
+  ],
   "author": "Andrea Giammarchi",
   "license": "MIT",
   "description": "Async IndexedDB based Map"
