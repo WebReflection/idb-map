@@ -87,10 +87,9 @@ There are other projects with a similar goal, most popular or notable is [idb-ke
 
   * there is no familiar *API* around this topic, everyone offering "*easy IndexedDB*" is kinda proposing a new *API*
   * there is nothing more similar than a *JS*' [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) to actually store *key / value* pairs
-  * the *Map* *API* is nothing new to learn, here the *IDBMap* is just about the same except it's inevitably *asynchronous*
-  * each *IDBMap* can be created with its own storage name, making multiple storages possible and all part of the same `@webreflection/idb-map` main database
+  * the *Map* *API* is nothing new to learn, here the *IDBMap* is just about the same except it's inevitably *asynchronous* ... but ...
+    * it is still possible via [coincident](https://github.com/WebReflection/coincident#readme) to have this transparently synchronous from a worker (if that's your cup of tea), making the *Map* a 1:1 familiar primitive that will persist its data in user's space
   * the *IDBMap* also extends [EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), forwarding internal events when/if needed
   * the *IDBMap* adds a `.close()` asynchronous method to ensure a db has been successfully closed
-  * it is still possible via [coincident](https://github.com/WebReflection/coincident#readme) to have this transparently synchronous from a worker (if that's your cup of tea), making the *Map* a 1:1 familiar primitive that will persist its data in user's space
 
 That's pretty much it; you already know this module and the only different thing is the way an *IDBMap* is initialized.
