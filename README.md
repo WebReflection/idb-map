@@ -14,7 +14,7 @@ An *IDBMap* also extends [EventTarget](https://developer.mozilla.org/en-US/docs/
 The *IDBMap* **constructor** is the only main different *API* compared to *Map*:
 
   * it accepts a database's `name` suffix as *string*. The DB will be called `'IDBMap/${name}'`. The storage name used for this *db* will be *entries*. An *empty* string is also a valid name but please be aware of naming collisions
-  * it accepts an optional `options` object, currently to either override transactions' *durability*, where its default value is `'default'`, or to use a different database prefix name which default value is `'IDBMap'`
+  * it accepts an optional `options` object, currently to either override transactions' **durability**, where its default value is `'default'`, or to use a different database **prefix** name which default value is `'IDBMap'`
 
 ```ts
 type IDBMapOptions = {
