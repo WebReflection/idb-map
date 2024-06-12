@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module">
+        import IDBMap from '../index.js';
+
+        const encoder = new TextEncoder;
+        const decoder = new TextDecoder;
+
+        const idbMap = new IDBMap('first');
+        console.log(`${idbMap}`);
+        console.log(await idbMap.size);
+        console.log(await idbMap.has('nope'));
+        await idbMap.set('test.txt', 'test value');
+        console.log(await idbMap.has('test.txt'));
+        await idbMap.set('other.txt', encoder.encode('other value'));
+        console.log(await idbMap.get('test.txt'));
+        console.log(decoder.decode(await idbMap.get('other.txt')));
+        console.log(await idbMap.keys());
+        console.log(await idbMap.size);
+        for (const entry of await idbMap.entries())
+            console.log(entry);
+        await idbMap.delete('other.txt');
+        console.log(await idbMap.keys());
+        console.log(await idbMap.size);
+        await idbMap.clear();
+        console.log(await idbMap.keys());
+        console.log(await idbMap.size);
+        await idbMap.close();
+
+
+        const idbMap2 = new IDBMap('second', { prefix: 'SomethingElse' });
+        console.log(`${idbMap2}`);
+        console.log(await idbMap2.size);
+        await idbMap2.set('key', 'value');
+
+        document.body.textContent = '✅';
+    </script>
+</head>
+</html>

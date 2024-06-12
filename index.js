@@ -1,19 +1,19 @@
 const { assign } = Object;
 
+const STORAGE = 'entries';
 const READONLY = 'readonly';
 const READWRITE = 'readwrite';
 
 /**
- * @typedef {Object} IDBTransactionOptions
- * @prop {'strict' | 'relaxed' | 'default'} durability
+ * @typedef {Object} IDBMapOptions
+ * @prop {'strict' | 'relaxed' | 'default'} [durability]
+ * @prop {string} [prefix]
  */
 
 /** @typedef {[IDBValidKey, unknown]} IDBMapEntry */
 
-/** @type {IDBTransactionOptions} */
-const defaultOptions = { durability: 'default' };
-
-const events = new Set(['abort', 'close', 'error', 'versionchange']);
+/** @type {IDBMapOptions} */
+const defaultOptions = { durability: 'default', prefix: 'IDBMap' };
 
 /**
  * @template T
@@ -24,9 +24,9 @@ const result = ({ target: { result } }) => result;
 
 export default class IDBMap extends EventTarget {
   // Privates
-  /** @type {Promise<IDBDatabase>} */   #db;
-  /** @type {string} */                 #name;
-  /** @type {IDBTransactionOptions} */  #options;
+  /** @type {Promise<IDBDatabase>} */ #db;
+  /** @type {IDBMapOptions} */ #options;
+  /** @type {string} */ #prefix;
 
   /**
    * @template T
@@ -36,9 +36,9 @@ export default class IDBMap extends EventTarget {
    */
   async #transaction(what, how) {
     const db = await this.#db;
-    const t = db.transaction(this.#name, how, this.#options);
+    const t = db.transaction(STORAGE, how, this.#options);
     return new Promise((onsuccess, onerror) => assign(
-      what(t.objectStore(this.#name)),
+      what(t.objectStore(STORAGE)),
       {
         onsuccess,
         onerror,
@@ -48,19 +48,19 @@ export default class IDBMap extends EventTarget {
 
   /**
    * @param {string} name
-   * @param {IDBTransactionOptions} options
+   * @param {IDBMapOptions} options
    */
-  constructor(name = '', options = defaultOptions) {
+  constructor(name, { durability, prefix } = defaultOptions) {
     super();
-    this.#name = name;
-    this.#options = options;
+    this.#prefix = prefix || defaultOptions.prefix;
+    this.#options = { durability: durability || defaultOptions.durability };
     this.#db = new Promise((resolve, reject) => {
       assign(
-        indexedDB.open('IDBMap'),
+        indexedDB.open(`${this.#prefix}/${name}`),
         {
           onupgradeneeded({ target: { result, transaction } }) {
-            if (!result.objectStoreNames.contains(name))
-              result.createObjectStore(name);
+            if (!result.objectStoreNames.length)
+              result.createObjectStore(STORAGE);
             transaction.oncomplete = () => resolve(result);
           },
           onsuccess(event) {
@@ -88,10 +88,10 @@ export default class IDBMap extends EventTarget {
    * @returns 
    */
   dispatchEvent(event) {
-    const { type, message } = event;
+    const { type, message, isTrusted } = event;
     return super.dispatchEvent(
       // avoid re-dispatching of the same event
-      events.has(type) ?
+      isTrusted ?
         assign(new Event(type), { message }) :
         event
     );
@@ -125,19 +125,6 @@ export default class IDBMap extends EventTarget {
       store => store.delete(key),
       READWRITE,
     );
-  }
-
-  async keys() {
-    const keys = await this.#transaction(
-      store => store.getAllKeys(),
-      READONLY,
-    ).then(result);
-    return keys;
-  }
-
-  async values() {
-    const keys = await this.keys();
-    return Promise.all(keys.map(key => this.get(key)));
   }
 
   /**
@@ -180,6 +167,14 @@ export default class IDBMap extends EventTarget {
     return k !== void 0;
   }
 
+  async keys() {
+    const keys = await this.#transaction(
+      store => store.getAllKeys(),
+      READONLY,
+    ).then(result);
+    return keys;
+  }
+
   /**
    * @param {IDBValidKey} key
    * @param {unknown} value
@@ -190,5 +185,14 @@ export default class IDBMap extends EventTarget {
       READWRITE,
     );
     return this;
+  }
+
+  async values() {
+    const keys = await this.keys();
+    return Promise.all(keys.map(key => this.get(key)));
+  }
+
+  get [Symbol.toStringTag]() {
+    return this.#prefix;
   }
 }
