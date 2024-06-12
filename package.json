@@ -1,6 +1,6 @@
 {
   "name": "@webreflection/idb-map",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "type": "module",
   "main": "index.js",
   "module": "index.js",
