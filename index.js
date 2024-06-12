@@ -50,10 +50,16 @@ export default class IDBMap extends EventTarget {
    * @param {string} name
    * @param {IDBMapOptions} options
    */
-  constructor(name, { durability, prefix } = defaultOptions) {
+  constructor(
+    name,
+    {
+      durability = defaultOptions.durability,
+      prefix = defaultOptions.prefix,
+    } = defaultOptions
+  ) {
     super();
-    this.#prefix = prefix || defaultOptions.prefix;
-    this.#options = { durability: durability || defaultOptions.durability };
+    this.#prefix = prefix;
+    this.#options = { durability };
     this.#db = new Promise((resolve, reject) => {
       assign(
         indexedDB.open(`${this.#prefix}/${name}`),
