@@ -80,6 +80,60 @@ await idbMap.close();
 
 - - -
 
+## IDBMapSync API
+
+The `idb-map/sync` export returns an instance of *Map* (no *EventTarget*) with only a `sync()` extra method that is needed to be awaited on bootstrap or, if many changes are performed, before closing the thread.
+
+Its content and methods are entirely loaded into *RAM* so it's less efficient in that regard but surely easier to both handle and reason about plus it's definitively faster than the fully async version.
+
+```js
+import IDBMapSync from '@webreflection/idb-map/sync';
+
+// create an async map with a generic storage name
+const idbMap = new IDBMap('my-storage-name');
+
+// await to populate it on bootstrap
+await idbMap.sync();
+
+// check any Map property by awaiting it
+console.log(idbMap.size);
+console.log(idbMap.has('nope'));
+
+// optional helpers for buffered data
+const encoder = new TextEncoder;
+const decoder = new TextDecoder;
+
+// set any IDB compatible value
+idbMap.set('test.txt', 'test value');
+console.log(idbMap.has('test.txt'));
+idbMap.set('other.txt', encoder.encode('other value'));
+
+// get any IDB stored value
+console.log(idbMap.get('test.txt'));
+console.log(decoder.decode(idbMap.get('other.txt')));
+
+// retrieve any other async Map API method
+console.log(idbMap.keys());
+console.log(idbMap.size);
+for (const entry of idbMap.entries())
+    console.log(entry);
+
+// or remove a single key
+idbMap.delete('other.txt');
+console.log(idbMap.keys());
+console.log(idbMap.size);
+
+// or clear the whole thing
+idbMap.clear();
+console.log(idbMap.keys());
+console.log(idbMap.size);
+
+// eventually sync it before exiting
+await idbMap.sync();
+```
+
+- - -
+
 
 ### Background / Goal / Why
 

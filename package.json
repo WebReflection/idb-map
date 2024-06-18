@@ -9,12 +9,18 @@
     "Map"
   ],
   "scripts": {
-    "build": "ascjs --no-default index.js index.cjs"
+    "build": "npm run build:index && npm run build:sync",
+    "build:index": "ascjs --no-default index.js index.cjs",
+    "build:sync": "ascjs --no-default sync.js sync.cjs"
   },
   "exports": {
     ".": {
       "import": "./index.js",
       "default": "./index.cjs"
+    },
+    "./sync": {
+      "import": "./sync.js",
+      "default": "./sync.cjs"
     },
     "./package.json": "./package.json"
   },

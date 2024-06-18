@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module">
+        import IDBMap from '../sync.js';
+
+        // create an async map with a generic storage name
+        const idbMap = new IDBMap('my-storage-name');
+
+        // await to populate it on bootstrap
+        await idbMap.sync();
+
+        // check any Map property by awaiting it
+        console.log(idbMap.size);
+        console.log(idbMap.has('nope'));
+
+        // optional helpers for buffered data
+        const encoder = new TextEncoder;
+        const decoder = new TextDecoder;
+
+        // set any IDB compatible value
+        idbMap.set('test.txt', 'test value');
+        console.log(idbMap.has('test.txt'));
+        idbMap.set('other.txt', encoder.encode('other value'));
+
+        // get any IDB stored value
+        console.log(idbMap.get('test.txt'));
+        console.log(decoder.decode(idbMap.get('other.txt')));
+
+        // retrieve any other async Map API method
+        console.log(idbMap.keys());
+        console.log(idbMap.size);
+        for (const entry of idbMap.entries())
+            console.log(entry);
+
+        // or remove a single key
+        idbMap.delete('other.txt');
+        console.log(idbMap.keys());
+        console.log(idbMap.size);
+
+        // or clear the whole thing
+        idbMap.clear();
+        console.log(idbMap.keys());
+        console.log(idbMap.size);
+
+        // eventually sync it before exiting
+        await idbMap.sync();
+
+        document.body.textContent = '✅';
+    </script>
+</head>
+</html>
