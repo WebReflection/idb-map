@@ -1,5 +1,5 @@
 'use strict';
-const IDBMap = (require('./index.js'));
+const IDBMap = (require('./index.cjs'));
 
 module.exports = class IDBMapSync extends Map {
   #map;

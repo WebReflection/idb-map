@@ -11,7 +11,7 @@
   "scripts": {
     "build": "npm run build:index && npm run build:sync",
     "build:index": "ascjs --no-default index.js index.cjs",
-    "build:sync": "ascjs --no-default sync.js sync.cjs"
+    "build:sync": "ascjs --no-default sync.js sync.cjs && sed -i 's/index\\.js/index\\.cjs/' sync.cjs"
   },
   "exports": {
     ".": {
