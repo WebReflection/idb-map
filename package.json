@@ -8,6 +8,16 @@
     "IndexedDB",
     "Map"
   ],
+  "scripts": {
+    "build": "ascjs --no-default index.js index.cjs"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "default": "./index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
   "author": "Andrea Giammarchi",
   "license": "MIT",
   "description": "Async IndexedDB based Map",
@@ -18,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/WebReflection/idb-map/issues"
   },
-  "homepage": "https://github.com/WebReflection/idb-map#readme"
+  "homepage": "https://github.com/WebReflection/idb-map#readme",
+  "devDependencies": {
+    "ascjs": "^6.0.3"
+  }
 }
