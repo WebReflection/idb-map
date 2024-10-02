@@ -90,7 +90,7 @@ Its content and methods are entirely loaded into *RAM* so it's less efficient in
 import IDBMapSync from '@webreflection/idb-map/sync';
 
 // create an async map with a generic storage name
-const idbMap = new IDBMap('my-storage-name');
+const idbMap = new IDBMapSync('my-storage-name');
 
 // await to populate it on bootstrap
 await idbMap.sync();

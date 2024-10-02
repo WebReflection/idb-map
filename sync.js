@@ -11,6 +11,10 @@ export default class IDBMapSync extends Map {
         super.set(key, value);
     });
   }
+  async close() {
+    await this.#queue;
+    await this.#map.close();
+  }
   async sync() {
     await this.#queue;
   }
